@@ -1,0 +1,28 @@
+name: adopet
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  cached_network_image: ^3.4.1
+  flutter:
+    sdk: flutter
+  provider: ^6.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/owner.png
+    - assets/orange_dog.png
+    - assets/blue_dog.png
+    - assets/red_dog.png
+    - assets/yellow_dog.png
+    - assets/white_dog.png
