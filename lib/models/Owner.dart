@@ -3,5 +3,17 @@ class Owner {
   final String description;
   final String imagePath;
 
-  Owner(this.name, this.description, this.imagePath);
+  Owner({
+    required this.name,
+    required this.description,
+    required this.imagePath,
+  });
+
+  factory Owner.fromJson(Map<String, dynamic> json) {
+    return Owner(
+      name: json['name'],
+      description: json['description'],
+      imagePath: 'assets/${json['imagePath']}',
+    );
+  }
 }

@@ -46,7 +46,7 @@ class PetDetailsScreen extends StatelessWidget {
                           Icon(Icons.location_on, size: 16, color: Colors.red),
                           SizedBox(width: 4),
                           Text(
-                            dog.location,
+                            dog.distance,
                             style: TextStyle(color: Colors.grey[600]),
                           ),
                         ],
