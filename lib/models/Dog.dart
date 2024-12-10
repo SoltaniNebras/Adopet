@@ -10,7 +10,7 @@ class Dog {
   final String distance;
   final String imagePath;
   final String description;
-  final Owner owner;
+  //final Owner owner;
   final String personality;
 
   Dog({
@@ -23,7 +23,7 @@ class Dog {
     required this.distance,
     required this.imagePath,
     required this.description,
-    required this.owner,
+   // required this.owner,
     required this.personality,
   });
 
@@ -36,10 +36,24 @@ class Dog {
       color: json['color'],
       weight: json['weight'],
       distance: json['distance'],
-      imagePath: 'assets/${json['imagePath']}',
+      imagePath:json['imagePath'],
       description: json['description'],
-      owner: Owner.fromJson(json['owner']),
+      //owner: Owner.fromJson(json['owner']),
       personality: json['personality'],
     );
+  }
+   Map<String, dynamic> toJson() {
+    return {
+      "name": name,
+      "age": age,
+      "gender": gender,
+      "color": color,
+      "weight": weight,
+      "distance": distance,
+      "imagePath": imagePath,
+      "description": description,
+      "personality": personality,
+      //"owner": owner.toJson(),
+    };
   }
 }
