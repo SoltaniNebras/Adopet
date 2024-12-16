@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:adopet/api_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddDogScreen extends StatefulWidget {
+  const AddDogScreen({super.key});
+
   @override
   _AddDogScreenState createState() => _AddDogScreenState();
 }
@@ -67,7 +68,7 @@ class _AddDogScreenState extends State<AddDogScreen> {
 
         await Future.delayed(Duration(seconds: 2));
 
-        context.go('/');
+        context.go('/list');
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Échec de l'ajout du chien : $error")),

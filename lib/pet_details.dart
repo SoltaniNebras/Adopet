@@ -4,7 +4,7 @@ import 'models/Dog.dart';
 class PetDetailsScreen extends StatelessWidget {
   final Dog dog;
 
-  const PetDetailsScreen({Key? key, required this.dog}) : super(key: key);
+  const PetDetailsScreen({super.key, required this.dog});
 
   @override
   Widget build(BuildContext context) {

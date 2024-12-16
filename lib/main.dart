@@ -1,11 +1,11 @@
-import 'package:adopet/EditDogScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'models/Dog.dart';
-import 'api_service.dart';
-import 'pet_details.dart';
 import 'AddDogScreen.dart';
+import 'EditDogScreen.dart';
+import 'DogListScreen.dart';
+import 'pet_details.dart';
+import 'models/Dog.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,6 +16,10 @@ class MyApp extends StatelessWidget {
     routes: [
       GoRoute(
         path: '/',
+        builder: (context, state) => HomePage(),
+      ),
+      GoRoute(
+        path: '/list',
         builder: (context, state) => PetListScreen(),
       ),
       GoRoute(
@@ -30,223 +34,131 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
-  path: '/edit',
-  builder: (context, state) {
-    final dog = state.extra as Dog;
-    return EditDogScreen(dog: dog);
-  },
-),
-
+        path: '/edit',
+        builder: (context, state) {
+          final dog = state.extra as Dog;
+          return EditDogScreen(dog: dog);
+        },
+      ),
     ],
   );
+
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      routerConfig: _router,
       debugShowCheckedModeBanner: false,
       title: 'Adopet - Dogs for Adoption',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
         textTheme: GoogleFonts.robotoTextTheme(),
+        primarySwatch: Colors.blue,
       ),
+      routerConfig: _router,
     );
   }
 }
-class PetListScreen extends StatefulWidget {
-  @override
-  _PetListScreenState createState() => _PetListScreenState();
-}
-
-class _PetListScreenState extends State<PetListScreen> {
-  late Future<List<Dog>> _dogsFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _dogsFuture = ApiService.fetchDogs();
-  }
-
-  // Delete dog and refresh the list after confirmation
-  Future<void> _deleteDog(Dog dog) async {
-    bool? confirmDelete = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Confirmer la suppression"),
-        content: Text("Êtes-vous sûr de vouloir supprimer ce chien ?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text("Annuler"),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text("Supprimer"),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmDelete == true) {
-      try {
-        await ApiService.deleteDog(dog.id);
-        setState(() {
-          _dogsFuture = ApiService.fetchDogs(); // Refresh the list after deletion
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Chien supprimé avec succès")),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erreur lors de la suppression du chien")),
-        );
-      }
-    }
-  }
-Widget _buildDogCard(Dog dog) {
-  return Card(
-    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    elevation: 3,
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Image du chien
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              "http://localhost:5000${dog.imagePath}",
-              fit: BoxFit.cover,
-              width: 80,
-              height: 80,
-              errorBuilder: (context, error, stackTrace) =>
-                  Icon(Icons.pets, size: 80, color: Colors.grey),
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Détails du chien
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  dog.name,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "${dog.age.toStringAsFixed(1)} yrs | ${dog.personality}",
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(Icons.location_pin, color: Colors.red, size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      dog.distance,
-                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Genre du chien (icône colorée)
-          Container(
-            decoration: BoxDecoration(
-              color: dog.gender.toLowerCase() == "male"
-                  ? Colors.blue[100]
-                  : Colors.pink[100],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            child: Text(
-              dog.gender,
-              style: TextStyle(
-                color: dog.gender.toLowerCase() == "male"
-                    ? Colors.blue
-                    : Colors.pink,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          // Edit and Delete buttons
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(Icons.edit, color: Colors.blue),
-                onPressed: () {
-                  context.go('/edit', extra: dog); // Navigate to the Edit screen
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.delete, color: Colors.red),
-                onPressed: () => _deleteDog(dog),
-              ),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Adopet - Dogs for Adoption"),
-        centerTitle: true,
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          setState(() {
-            _dogsFuture = ApiService.fetchDogs();
-          });
-        },
-        child: FutureBuilder<List<Dog>>(
-          future: _dogsFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text("Erreur : ${snapshot.error}"));
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(
-                child: Text("Aucun chien disponible à l'adoption."),
-              );
-            } else {
-              final dogs = snapshot.data!;
-              return ListView.builder(
-                itemCount: dogs.length,
-                itemBuilder: (context, index) {
-                  final dog = dogs[index];
-                  return GestureDetector(
-                    onTap: () {
-                      context.go('/details', extra: dog);
-                    },
-                    child: _buildDogCard(dog),
-                  );
-                },
-              );
-            }
-          },
+      body: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color.fromARGB(255, 242, 234, 255), Color.fromARGB(255, 255, 255, 255)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.go('/add');
-        },
-        child: Icon(Icons.add),
-        tooltip: 'Ajouter un chien',
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Image circulaire avec un cadre coloré
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: 220,
+                  height: 220,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+                ),
+                ClipOval(
+                  child: Image.asset(
+                    'assets/adopt.png', // Assurez-vous d'ajouter une image dans le dossier assets
+                    width: 500,
+                    height: 500,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            // Texte principal
+            RichText(
+              text: TextSpan(
+                style: TextStyle(fontSize: 20, color: Colors.black),
+                children: [
+                  TextSpan(
+                    text: "Find ",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orangeAccent,
+                    ),
+                  ),
+                  TextSpan(
+                    text: "Your Best  🐶  ",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: "With Us",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              "Join & discover the best suitable pets in\nyour location or near you.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey[700]),
+            ),
+            SizedBox(height: 30),
+            // Button Explore
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32), backgroundColor: const Color.fromARGB(255, 120, 169, 255),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                shadowColor: Colors.black12,
+                elevation: 10,
+              ),
+              child: Icon(
+                Icons.pets,
+                color: Colors.white,
+                size: 32,
+              ),
+              onPressed: () {
+                context.go('/list'); // Navigate to /list when pressed
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
