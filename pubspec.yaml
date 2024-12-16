@@ -10,12 +10,19 @@ dependencies:
   cached_network_image: ^3.4.1
   flutter:
     sdk: flutter
+  http: ^1.2.2
+  go_router: ^14.6.2
+  image_picker: ^1.1.2
+  dio: ^5.0.0
+  google_fonts: ^6.2.1
+  html: ^0.15.5
   provider: ^6.1.2
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
@@ -26,3 +33,5 @@ flutter:
     - assets/red_dog.png
     - assets/yellow_dog.png
     - assets/white_dog.png
+    - assets/adopt.png
+

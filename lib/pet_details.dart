@@ -4,10 +4,15 @@ import 'models/Dog.dart';
 class PetDetailsScreen extends StatelessWidget {
   final Dog dog;
 
-  const PetDetailsScreen({Key? key, required this.dog}) : super(key: key);
+  const PetDetailsScreen({super.key, required this.dog});
 
   @override
   Widget build(BuildContext context) {
+    // Gérer les chemins relatifs ou absolus
+    final imageUrl = dog.imagePath.startsWith('http')
+        ? dog.imagePath
+        : 'http://localhost:5000${dog.imagePath}';
+
     return Scaffold(
       appBar: AppBar(title: Text(dog.name)),
       body: SingleChildScrollView(
@@ -15,19 +20,44 @@ class PetDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Section image
             Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.asset(
-                  dog.imagePath,
+                child: Image.network(
+                  imageUrl,
                   height: 250,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 250,
+                      width: double.infinity,
+                      color: Colors.grey[300],
+                      child: Icon(
+                        Icons.error,
+                        size: 100,
+                        color: Colors.red,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
             SizedBox(height: 16),
 
+            // Nom et informations principales
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -46,14 +76,14 @@ class PetDetailsScreen extends StatelessWidget {
                           Icon(Icons.location_on, size: 16, color: Colors.red),
                           SizedBox(width: 4),
                           Text(
-                            dog.location,
+                            dog.distance,
                             style: TextStyle(color: Colors.grey[600]),
                           ),
                         ],
                       ),
                       SizedBox(height: 4),
                       Text(
-                        "2 yrs | ${dog.personality}",
+                        "${dog.age} yrs | ${dog.personality}",
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                     ],
@@ -77,7 +107,7 @@ class PetDetailsScreen extends StatelessWidget {
             ),
             SizedBox(height: 16),
 
-            // About Me Section
+            // Section "About Me"
             Text(
               "About me",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -89,6 +119,7 @@ class PetDetailsScreen extends StatelessWidget {
             ),
             SizedBox(height: 24),
 
+            // Informations supplémentaires
             Text(
               "Quick Info",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
